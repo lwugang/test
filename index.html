@@ -47,9 +47,9 @@
 		var xhr = new XMLHttpRequest();
 		var reader = new FileReader();
 		//alert(location.href+'/data-201753.db')
-		xhr.open('GET','http://git.oschina.net/lwg/test/raw/master/data-201753.db', true); //在App中的相对路径
+		xhr.open('GET','https://lwugang.github.io/test/data-201753.db', true); //在App中的相对路径
 		xhr.responseType = 'arraybuffer';
-		xhr.setRequestHeader("Access-Control-Allow-Origin","*")
+		xhr.setRequestHeader("Access-Control-Allow-Origin","http://aa1067011755.3vcm.net")
 		var db, loadMoreNode;
 		xhr.onload = function(e) {
 			var uInt8Array = new Uint8Array(this.response);
