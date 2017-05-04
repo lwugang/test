@@ -46,7 +46,6 @@
 	<script>
 		var xhr = new XMLHttpRequest();
 		var reader = new FileReader();
-
 		function UrlSearch() {
 			var name, value;
 			var str = location.href; //取得整个地址栏
@@ -62,7 +61,6 @@
 				}
 			}
 		}
-
 		function getNowFormatDate() {
 			var date = new Date();
 			var seperator1 = "";
@@ -83,7 +81,6 @@
 			var uInt8Array = new Uint8Array(this.response);
 			db = new SQL.Database(uInt8Array);
 			loadData();
-
 			loadMoreNode = document.createElement("p");
 			loadMoreNode.className = "loadMore";
 			loadMoreNode.align = "center";
@@ -91,31 +88,15 @@
 			loadMoreNode.innerHTML = "加载更多";
 			document.body.appendChild(loadMoreNode);
 		};
-
-		function getRootPath() {
-			//获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp  
-			var curWwwPath = window.document.location.href;
-			//获取主机地址之后的目录，如： uimcardprj/share/meun.jsp  
-			var pathName = window.document.location.pathname;
-			var pos = curWwwPath.indexOf(pathName);
-			//获取主机地址，如： http://localhost:8083  
-			var localhostPaht = curWwwPath.substring(0, pos);
-			//获取带"/"的项目名，如：/uimcardprj  
-			var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
-			return(localhostPaht + projectName);
-		}
-		//		reader.readAsArrayBuffer(new File('E:\hbuilderProject\demo\data-201753.db'));
 		var offset = 0;
-
 		function loadMore() {
-			offset += 20;
+			offset += 10;
 			document.body.removeChild(loadMoreNode);
 			loadData();
 			document.body.appendChild(loadMoreNode);
 		}
-
 		function loadData() {
-			var contents = db.exec("select * from excelTable limit 20 offset " + offset); //执行查询语句
+			var contents = db.exec("select * from excelTable limit 10 offset " + offset); //执行查询语句
 			var html = "<img width='100%' class='shoopImg' height='220'/>" +
 				"<p style='width: 100%;word-break:break-word; padding-top: 5px;' class='title'></p>" +
 				"<div style='margin-top: 10px;'>" +
@@ -133,18 +114,12 @@
 				"<p style='background:rgba(0,0,0,0.3); color: white;font-weight: bold; position: absolute;top: 195px;" +
 				"line-height: 25px;" +
 				"width: 100%;' align='center' class='youHuiQuan'></p>";
-
 			//document.body.innerHTML = "";
 			for(i = 0; i < contents[0].values.length; i++) {
 				//document.writeln(contents[0].values[1][1])
 				var div = document.createElement("div");
 				div.className = "left";
 				div.innerHTML = html;
-				var detailUrl = contents[0].values[i][2];
-				div.onclick = function() {
-					location.href = detailUrl;
-				};
-
 				var title = div.getElementsByClassName("title")[0];
 				var yongJin = div.getElementsByClassName("yongJin")[0];
 				var youHuiQuan = div.getElementsByClassName("youHuiQuan")[0];
@@ -153,8 +128,18 @@
 				var yueXiaoLiang = div.getElementsByClassName("yueXiaoLiang")[0];
 				var biLv = div.getElementsByClassName("biLv")[0];
 				var tuiGuang = div.getElementsByClassName("tuiGuang")[0];
-				tuiGuang.href = contents[0].values[i][3];
-
+				
+				var detailUrl = contents[0].values[i][2];
+				shoopImg.onclick = function() {
+					location.href = detailUrl;
+				};
+				
+				tuiGuang.href = "javascript:void(0)";
+				var tuiGuangUrl = contents[0].values[i][3];
+				tuiGuang.onclick = function(){
+					location.href = tuiGuangUrl;
+				}
+				
 				title.innerHTML = contents[0].values[i][0];
 				yongJin.innerHTML = "佣金：" + contents[0].values[i][4];
 				youHuiQuan.innerHTML = contents[0].values[i][7];
@@ -162,11 +147,10 @@
 				price.innerHTML = "￥" + contents[0].values[i][4];
 				yueXiaoLiang.innerHTML = "月销量：" + contents[0].values[i][8];
 				biLv.innerHTML = "比率：" + contents[0].values[i][8];
-
+				
 				document.body.appendChild(div);
 			}
 		}
-
 		xhr.send();
 	</script>
 	<center>
