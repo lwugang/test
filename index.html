@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<script type="text/javascript" src="js/sql.js"></script>
+		<title></title>
+	</head>
+	<style>
+		p,
+		div {
+			padding: 0;
+			margin: 0;
+		}
+		
+		body {
+			max-width: 480px;
+			margin: 0 auto;
+		}
+		
+		.title {
+			font-family: "微软雅黑";
+			font-size: 14px;
+		}
+		
+		.left {
+			width: 47%;
+			height: 380px;
+			float: left;
+			margin-left: 5px;
+			margin-right: 5px;
+			position: relative;
+		}
+		
+		.loadMore {
+			margin-top: 10px;
+			clear: both;
+			color: white;
+			background: gray;
+			padding: 5px;
+		}
+	</style>
+	<script>
+		var xhr = new XMLHttpRequest();
+		var reader = new FileReader();
+		//alert(location.href+'/data-201753.db')
+		xhr.open('GET','http://git.oschina.net/lwg/test/raw/master/data-201753.db', true); //在App中的相对路径
+		xhr.responseType = 'arraybuffer';
+		xhr.setRequestHeader("Access-Control-Allow-Origin","*")
+		var db, loadMoreNode;
+		xhr.onload = function(e) {
+			var uInt8Array = new Uint8Array(this.response);
+			db = new SQL.Database(uInt8Array);
+			loadData();
+
+			loadMoreNode = document.createElement("p");
+			loadMoreNode.className = "loadMore";
+			loadMoreNode.align = "center";
+			loadMoreNode.onclick = loadMore;
+			loadMoreNode.innerHTML = "加载更多";
+			document.body.appendChild(loadMoreNode);
+		};
+
+		function getRootPath() {
+			//获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp  
+			var curWwwPath = window.document.location.href;
+			//获取主机地址之后的目录，如： uimcardprj/share/meun.jsp  
+			var pathName = window.document.location.pathname;
+			var pos = curWwwPath.indexOf(pathName);
+			//获取主机地址，如： http://localhost:8083  
+			var localhostPaht = curWwwPath.substring(0, pos);
+			//获取带"/"的项目名，如：/uimcardprj  
+			var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+			return(localhostPaht + projectName);
+		}
+		//		reader.readAsArrayBuffer(new File('E:\hbuilderProject\demo\data-201753.db'));
+		var offset = 0;
+
+		function loadMore() {
+			offset += 20;
+			document.body.removeChild(loadMoreNode);
+			loadData();
+			document.body.appendChild(loadMoreNode);
+		}
+
+		function loadData() {
+			var contents = db.exec("select * from excelTable limit 20 offset " + offset); //执行查询语句
+			var html = "<img width='100%' class='shoopImg' height='220'/>" +
+				"<p style='width: 100%;word-break:break-word; padding-top: 5px;' class='title'></p>" +
+				"<div style='margin-top: 10px;'>" +
+				"<p style='width: 48%;float: left;font-size:12px;' class='price' align='left'>0.0</p>" +
+				"<p style='width: 48%;float: right;font-size:12px;' class='yueXiaoLiang' align='right'>010</p>" +
+				"</div>" +
+				"<div>" +
+				"<p style='width: 48%;float: left;font-size:12px;color:#E9967A;' class='biLv' align='left'>0.0</p>" +
+				"<p style='width: 48%;float: right;font-size:12px;' class='yongJin' align='right'>020</p>" +
+				"</div>" +
+				"&nbsp;&nbsp;" +
+				"<p align='center' class='tuiGuang'>" +
+				"<a href='#' style='color: red;'>推广链接</a>" +
+				"</p>" +
+				"<p style='background:rgba(0,0,0,0.3); color: white;font-weight: bold; position: absolute;top: 195px;" +
+				"line-height: 25px;" +
+				"width: 100%;' align='center' class='youHuiQuan'></p>";
+
+			//document.body.innerHTML = "";
+			for(i = 0; i < contents[0].values.length; i++) {
+				//document.writeln(contents[0].values[1][1])
+				var div = document.createElement("div");
+				div.className = "left";
+				div.innerHTML = html;
+				var detailUrl = contents[0].values[i][2];
+				div.onclick = function() {
+					location.href = detailUrl;
+				};
+
+				var title = div.getElementsByClassName("title")[0];
+				var yongJin = div.getElementsByClassName("yongJin")[0];
+				var youHuiQuan = div.getElementsByClassName("youHuiQuan")[0];
+				var shoopImg = div.getElementsByClassName("shoopImg")[0];
+				var price = div.getElementsByClassName("price")[0];
+				var yueXiaoLiang = div.getElementsByClassName("yueXiaoLiang")[0];
+				var biLv = div.getElementsByClassName("biLv")[0];
+				var tuiGuang = div.getElementsByClassName("tuiGuang")[0];
+				tuiGuang.onclick = function() {
+					location.href = contents[0].values[i][3];
+				}
+
+				title.innerHTML = contents[0].values[i][0];
+				yongJin.innerHTML = "佣金：" + contents[0].values[i][4];
+				youHuiQuan.innerHTML = contents[0].values[i][7];
+				shoopImg.src = contents[0].values[i][1];
+				price.innerHTML = "￥" + contents[0].values[i][4];
+				yueXiaoLiang.innerHTML = "月销量：" + contents[0].values[i][8];
+				biLv.innerHTML = "比率：" + contents[0].values[i][8];
+
+				document.body.appendChild(div);
+			}
+		}
+
+		xhr.send();
+	</script>
+	<center>
+
+		<body>
+
+		</body>
+	</center>
+
+</html>
