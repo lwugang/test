@@ -108,14 +108,14 @@
 		var offset = 0;
 
 		function loadMore() {
-			offset += 20;
+			offset += 10;
 			document.body.removeChild(loadMoreNode);
 			loadData();
 			document.body.appendChild(loadMoreNode);
 		}
 
 		function loadData() {
-			var contents = db.exec("select * from excelTable limit 20 offset " + offset); //执行查询语句
+			var contents = db.exec("select * from excelTable limit 10 offset " + offset); //执行查询语句
 			var html = "<img width='100%' class='shoopImg' height='220'/>" +
 				"<p style='width: 100%;word-break:break-word; padding-top: 5px;' class='title'></p>" +
 				"<div style='margin-top: 10px;'>" +
