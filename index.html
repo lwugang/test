@@ -46,10 +46,38 @@
 	<script>
 		var xhr = new XMLHttpRequest();
 		var reader = new FileReader();
-		//alert(location.href+'/data-201753.db')
-		xhr.open('GET','https://lwugang.github.io/test/data-201753.db', true); //在App中的相对路径
+
+		function UrlSearch() {
+			var name, value;
+			var str = location.href; //取得整个地址栏
+			var num = str.indexOf("?")
+			str = str.substr(num + 1); //取得所有参数   stringvar.substr(start [, length ]
+			var arr = str.split("&"); //各个参数放到数组里
+			for(var i = 0; i < arr.length; i++) {
+				num = arr[i].indexOf("=");
+				if(num > 0) {
+					name = arr[i].substring(0, num);
+					value = arr[i].substr(num + 1);
+					this[name] = value;
+				}
+			}
+		}
+
+		function getNowFormatDate() {
+			var date = new Date();
+			var seperator1 = "";
+			var month = date.getMonth() + 1;
+			var strDate = date.getDate();
+			var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
+			return currentdate;
+		}
+		var Request = new UrlSearch(); //实例化
+		var t = getNowFormatDate();
+		if(Request.t) {
+			t = Request.t;
+		}
+		xhr.open('GET', "data-"+t+".db", true); //在App中的相对路径
 		xhr.responseType = 'arraybuffer';
-		xhr.setRequestHeader("Access-Control-Allow-Origin","http://aa1067011755.3vcm.net")
 		var db, loadMoreNode;
 		xhr.onload = function(e) {
 			var uInt8Array = new Uint8Array(this.response);
@@ -99,8 +127,8 @@
 				"<p style='width: 48%;float: right;font-size:12px;' class='yongJin' align='right'>020</p>" +
 				"</div>" +
 				"&nbsp;&nbsp;" +
-				"<p align='center' class='tuiGuang'>" +
-				"<a href='#' style='color: red;'>推广链接</a>" +
+				"<p align='center' >" +
+				"<a href='#' style='color: red;' class='tuiGuang'>推广链接</a>" +
 				"</p>" +
 				"<p style='background:rgba(0,0,0,0.3); color: white;font-weight: bold; position: absolute;top: 195px;" +
 				"line-height: 25px;" +
@@ -125,9 +153,7 @@
 				var yueXiaoLiang = div.getElementsByClassName("yueXiaoLiang")[0];
 				var biLv = div.getElementsByClassName("biLv")[0];
 				var tuiGuang = div.getElementsByClassName("tuiGuang")[0];
-				tuiGuang.onclick = function() {
-					location.href = contents[0].values[i][3];
-				}
+				tuiGuang.href = contents[0].values[i][3];
 
 				title.innerHTML = contents[0].values[i][0];
 				yongJin.innerHTML = "佣金：" + contents[0].values[i][4];
