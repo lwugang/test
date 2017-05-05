@@ -44,8 +44,6 @@
 		}
 	</style>
 	<script>
-		var xhr = new XMLHttpRequest();
-		var reader = new FileReader();
 		function UrlSearch() {
 			var name, value;
 			var str = location.href; //取得整个地址栏
@@ -61,40 +59,58 @@
 				}
 			}
 		}
+
+		var date = new Date();
+
 		function getNowFormatDate() {
-			var date = new Date();
 			var seperator1 = "";
 			var month = date.getMonth() + 1;
 			var strDate = date.getDate();
 			var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
 			return currentdate;
 		}
-		var Request = new UrlSearch(); //实例化
-		var t = getNowFormatDate();
-		if(Request.t) {
-			t = Request.t;
-		}
-		xhr.open('GET', "data-"+t+".db", true); //在App中的相对路径
-		xhr.responseType = 'arraybuffer';
+		window.onload = function(){requestData()}
+
 		var db, loadMoreNode;
-		xhr.onload = function(e) {
-			var uInt8Array = new Uint8Array(this.response);
-			db = new SQL.Database(uInt8Array);
-			loadData();
-			loadMoreNode = document.createElement("p");
-			loadMoreNode.className = "loadMore";
-			loadMoreNode.align = "center";
-			loadMoreNode.onclick = loadMore;
-			loadMoreNode.innerHTML = "加载更多";
-			document.body.appendChild(loadMoreNode);
-		};
+		function requestData() {
+			document.body.innerHTML = "";
+			var xhr = new XMLHttpRequest();
+			var Request = new UrlSearch(); //实例化
+			var t = getNowFormatDate();
+			if(Request.t) {
+				t = Request.t;
+			}
+			xhr.open('GET', "data-201754.db", true); //在App中的相对路径
+			xhr.responseType = 'arraybuffer';
+			xhr.onreadystatechange = function(data){
+				if(xhr.readyState==4&&xhr.status ==200){
+				}else if(xhr.status==404){
+					date.setDate(date.getDate()-1);
+					requestData();
+				}
+			}
+			xhr.onload = function(e) {
+				var uInt8Array = new Uint8Array(this.response);
+				db = new SQL.Database(uInt8Array);
+				loadData();
+				loadMoreNode = document.createElement("p");
+				loadMoreNode.className = "loadMore";
+				loadMoreNode.align = "center";
+				loadMoreNode.onclick = loadMore;
+				loadMoreNode.innerHTML = "加载更多";
+				document.body.appendChild(loadMoreNode);
+			}
+			xhr.send();
+		}
 		var offset = 0;
+
 		function loadMore() {
 			offset += 10;
 			document.body.removeChild(loadMoreNode);
 			loadData();
 			document.body.appendChild(loadMoreNode);
 		}
+
 		function loadData() {
 			var contents = db.exec("select * from excelTable limit 10 offset " + offset); //执行查询语句
 			var html = "<img width='100%' class='shoopImg' height='220'/>" +
@@ -128,18 +144,18 @@
 				var yueXiaoLiang = div.getElementsByClassName("yueXiaoLiang")[0];
 				var biLv = div.getElementsByClassName("biLv")[0];
 				var tuiGuang = div.getElementsByClassName("tuiGuang")[0];
-				
+
 				var detailUrl = contents[0].values[i][2];
 				shoopImg.onclick = function() {
 					location.href = detailUrl;
 				};
-				
+
 				tuiGuang.href = "javascript:void(0)";
 				var tuiGuangUrl = contents[0].values[i][3];
-				tuiGuang.onclick = function(){
+				tuiGuang.onclick = function() {
 					location.href = tuiGuangUrl;
 				}
-				
+
 				title.innerHTML = contents[0].values[i][0];
 				yongJin.innerHTML = "佣金：" + contents[0].values[i][4];
 				youHuiQuan.innerHTML = contents[0].values[i][7];
@@ -147,11 +163,10 @@
 				price.innerHTML = "￥" + contents[0].values[i][4];
 				yueXiaoLiang.innerHTML = "月销量：" + contents[0].values[i][8];
 				biLv.innerHTML = "比率：" + contents[0].values[i][8];
-				
+
 				document.body.appendChild(div);
 			}
 		}
-		xhr.send();
 	</script>
 	<center>
 
