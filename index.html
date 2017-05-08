@@ -6,7 +6,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/mui.min.css" />
 		<script type="text/javascript" src="js/sql.js"></script>
+		<script type="text/javascript" src="js/mui.js"></script>
 		<title></title>
 	</head>
 	<style>
@@ -69,24 +71,28 @@
 			var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
 			return currentdate;
 		}
-		window.onload = function(){requestData()}
+		var contentNode;
+		window.onload = function() {
+			contentNode = document.getElementById("content");
+			requestData();
+		}
 
 		var db, loadMoreNode;
+
 		function requestData() {
-			document.body.innerHTML = "";
+			contentNode.innerHTML = "";
 			var xhr = new XMLHttpRequest();
 			var Request = new UrlSearch(); //实例化
 			var t = getNowFormatDate();
 			if(Request.t) {
 				t = Request.t;
 			}
-			xhr.open('GET', "data-201754.db", true); //在App中的相对路径
+			xhr.open('GET', "data-"+t+".db", true); //在App中的相对路径
 			xhr.responseType = 'arraybuffer';
-			xhr.onreadystatechange = function(data){
-				if(xhr.readyState==4&&xhr.status ==200){
-				}else if(xhr.status==404){
-					date.setDate(date.getDate()-1);
-					requestData();
+			xhr.onreadystatechange = function(data) {
+				if(xhr.readyState == 4 && xhr.status == 200) {} else if(xhr.status == 404) {
+					date.setDate(date.getDate() - 1);
+					//requestData();
 				}
 			}
 			xhr.onload = function(e) {
@@ -98,21 +104,26 @@
 				loadMoreNode.align = "center";
 				loadMoreNode.onclick = loadMore;
 				loadMoreNode.innerHTML = "加载更多";
-				document.body.appendChild(loadMoreNode);
+				contentNode.appendChild(loadMoreNode);
 			}
 			xhr.send();
 		}
 		var offset = 0;
 
 		function loadMore() {
-			offset += 50;
-			document.body.removeChild(loadMoreNode);
+			offset += 30;
+			contentNode.removeChild(loadMoreNode);
 			loadData();
-			document.body.appendChild(loadMoreNode);
+			contentNode.appendChild(loadMoreNode);
 		}
+		var word = "";
 
 		function loadData() {
-			var contents = db.exec("select * from excelTable limit 50 offset " + offset); //执行查询语句
+			var sql = "select * from excelTable ";
+			if(word) {
+				sql += " where shoopName like '%" + word + "%'";
+			}
+			var contents = db.exec(sql + " limit 30 offset " + offset); //执行查询语句
 			var html = "<img width='100%' class='shoopImg' height='220'/>" +
 				"<p style='width: 100%;word-break:break-word; padding-top: 5px;' class='title'></p>" +
 				"<div style='margin-top: 10px;'>" +
@@ -164,14 +175,38 @@
 				yueXiaoLiang.innerHTML = "月销量：" + contents[0].values[i][8];
 				biLv.innerHTML = "比率：" + contents[0].values[i][8];
 
-				document.body.appendChild(div);
+				contentNode.appendChild(div);
+			}
+		}
+		function search() {
+			if(event && event.keyCode == 13) { // enter 键
+				//要做的事情
+				var value = document.getElementById("searchText").value;
+				if(value) {
+					contentNode.innerHTML="";
+					word = value;
+					requestData();
+				}
+			}
+		};
+		function reset(input){
+			if(!input.value){
+				contentNode.innerHTML="";
+				word = undefined;
+				requestData();
 			}
 		}
 	</script>
 	<center>
 
-		<body>
+		<body onkeydown="search()">
+			<div>
+				<div class="mui-input-row mui-search" style="margin-top: 10px;">
+					<input type="search" class="mui-input-clear" placeholder="" id="searchText" onblur="reset(this)">
+				</div>
+				<div id="content">
 
+				</div>
 		</body>
 	</center>
 
