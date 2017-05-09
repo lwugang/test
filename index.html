@@ -89,11 +89,9 @@
 				t = Request.t;
 			}
 			xhr.open('GET', "data-"+t+".db", true); //在App中的相对路径
-			alert("data-"+t+".db")
 			xhr.responseType = 'arraybuffer';
 			xhr.onreadystatechange = function(data) {
 				if(xhr.readyState == 4 && xhr.status == 200) {} else if(xhr.status == 404) {
-				alert('404----'+t)
 					date.setDate(date.getDate() - 1);
 					requestData();
 				}
