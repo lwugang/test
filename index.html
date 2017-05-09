@@ -30,10 +30,11 @@
 		
 		.left {
 			width: 47%;
-			height: 400px;
+			height: auto;
 			float: left;
 			margin-left: 5px;
 			margin-right: 5px;
+			margin-bottom: 10px;
 			position: relative;
 		}
 		
@@ -92,7 +93,7 @@
 			xhr.onreadystatechange = function(data) {
 				if(xhr.readyState == 4 && xhr.status == 200) {} else if(xhr.status == 404) {
 					date.setDate(date.getDate() - 1);
-					//requestData();
+					requestData();
 				}
 			}
 			xhr.onload = function(e) {
@@ -119,6 +120,8 @@
 		var word = "";
 
 		function loadData() {
+			if(localStorage)
+				word = localStorage.word;
 			var sql = "select * from excelTable ";
 			if(word) {
 				sql += " where shoopName like '%" + word + "%'";
@@ -171,28 +174,36 @@
 				yongJin.innerHTML = "佣金：" + contents[0].values[i][4];
 				youHuiQuan.innerHTML = contents[0].values[i][7];
 				shoopImg.src = contents[0].values[i][1];
-				price.innerHTML = "￥" + contents[0].values[i][4];
+				price.innerHTML = "￥" + contents[0].values[i][5];
 				yueXiaoLiang.innerHTML = "月销量：" + contents[0].values[i][8];
-				biLv.innerHTML = "比率：" + contents[0].values[i][8];
+				biLv.innerHTML = "比率：" + contents[0].values[i][6] + "%";
 
 				contentNode.appendChild(div);
 			}
 		}
+
 		function search() {
 			if(event && event.keyCode == 13) { // enter 键
 				//要做的事情
 				var value = document.getElementById("searchText").value;
 				if(value) {
-					contentNode.innerHTML="";
+					contentNode.innerHTML = "";
 					word = value;
+					if(localStorage) {
+						localStorage.word = word;
+					}
 					requestData();
 				}
 			}
 		};
-		function reset(input){
-			if(!input.value){
-				contentNode.innerHTML="";
+
+		function reset(input) {
+			if(!input.value) {
+				contentNode.innerHTML = "";
 				word = undefined;
+				if(localStorage) {
+					localStorage.word = word;
+				}
 				requestData();
 			}
 		}
@@ -201,7 +212,7 @@
 
 		<body onkeydown="search()">
 			<div>
-				<div class="mui-input-row mui-search" style="margin-top: 10px;margin-left:5px;margin-right:5px;">
+				<div class="mui-input-row mui-search" style="margin-top: 10px;">
 					<input type="search" class="mui-input-clear" placeholder="" id="searchText" onblur="reset(this)">
 				</div>
 				<div id="content">
